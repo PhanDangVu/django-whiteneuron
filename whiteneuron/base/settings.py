@@ -12,7 +12,7 @@ import sentry_sdk
 
 DATA_UPLOAD_MAX_NUMBER_FILES = environ.get("DATA_UPLOAD_MAX_NUMBER_FILES", 1000)
 
-PROJECT_NAME = environ.get("PROJECT_NAME", "base")
+PROJECT_NAME = environ.get("PROJECT_NAME", "whiteneuron.base")
 NAME= environ.get("NAME", "White Neuron")
 URL= environ.get("URL", f"https://{PROJECT_NAME.lower()}whiteneuron.com")
 
@@ -35,7 +35,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = environ.get("SECRET_KEY", get_random_secret_key())
 
-DEBUG = environ.get("DEBUG", "False") == "True"
+DEBUG = True
 # DEBUG = False
 
 ROOT_URLCONF = f"{PROJECT_NAME}.urls"
@@ -95,7 +95,7 @@ CORS_ALLOWED_ORIGINS = environ.get(
 # HTTPS/SSL Settings for Production
 ######################################################################
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    SECURE_SSL_REDIRECT = False
     SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
@@ -119,7 +119,12 @@ INSTALLED_APPS = [
     "whiteneuron.contrib", # Contrib app
     "whiteneuron.dashboard",
     "whiteneuron.notification",  # Notification app
+]
 
+if environ.get("SHOW_CHATBOT", "False") == "True":
+    INSTALLED_APPS.append("whiteneuron.chatbot")
+
+INSTALLED_APPS += [
     "modeltranslation",
     "unfold",
     "unfold.contrib.filters",  # optional, if special filters are needed
@@ -427,10 +432,10 @@ UNFOLD = {
     "STYLES": [
         lambda request: static("base/css/styles.css"),
         lambda request: static("base/css/btn-styles.css"),
-        lambda request: static("base/css/loading.css"),
+        lambda request: static("base/css/loading.css") + "?v=2",
     ],
     "SCRIPTS": [
-        lambda request: static("base/js/loading.js"),
+        lambda request: static("base/js/loading.js") + "?v=2",
         lambda request: static("base/js/whiteneuron.js"),
     ],
     "COLORS": {
