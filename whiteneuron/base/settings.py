@@ -430,7 +430,7 @@ UNFOLD = {
         "image": lambda request: static("base/images/login-bg.jpg"),
     },
     "STYLES": [
-        lambda request: static("base/css/styles.css"),
+        lambda request: static("base/css/styles.css") + f"?v={__import__('time').time()}",
         lambda request: static("base/css/btn-styles.css"),
         lambda request: static("base/css/loading.css") + "?v=2",
     ],

@@ -29,33 +29,6 @@
         }
     </style>
     <script>
-        if (typeof window.toggleMyPanel !== 'function') {
-            window.toggleMyPanel = function(forceClose) {
-                const panels = document.querySelectorAll('.custom-panel-drawer');
-                const overlays = document.querySelectorAll('.custom-panel-overlay');
-                
-                panels.forEach(panel => {
-                    if (forceClose === true) {
-                        panel.style.transform = 'translateX(100%)';
-                    } else {
-                        if (panel.style.transform === 'translateX(0px)' || panel.style.transform === 'translateX(0%)') {
-                            panel.style.transform = 'translateX(100%)';
-                        } else {
-                            panel.style.transform = 'translateX(0%)';
-                        }
-                    }
-                });
-                
-                overlays.forEach(overlay => {
-                    if (forceClose === true) {
-                        overlay.style.display = 'none';
-                    } else {
-                        overlay.style.display = (overlay.style.display === 'block') ? 'none' : 'block';
-                    }
-                });
-            }
-        }
-
         document.addEventListener('DOMContentLoaded', function() {
             const chatForms = document.querySelectorAll('.chat-form');
             chatForms.forEach(form => {
@@ -66,7 +39,7 @@
                     const message = input.value.trim();
                     if (!message) return;
                     
-                    const panelDrawer = this.closest('.custom-panel-drawer');
+                    const panelDrawer = this.closest('.ui-drawer-side');
                     const messagesContainer = panelDrawer.querySelector('.chat-messages');
                     const submitBtn = this.querySelector('.chat-submit');
                     
@@ -86,7 +59,7 @@
                     const loadingId = 'loading-' + Date.now();
                     messagesContainer.insertAdjacentHTML('beforeend', `
                         <div class="flex justify-start mb-4" id="${loadingId}">
-                            <div class="bg-gray-200 dark:bg-base-800 text-gray-800 dark:text-gray-200 text-sm py-2 px-4 rounded-2xl rounded-tl-sm shadow-sm flex items-center gap-2">
+                            <div class="bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm py-2 px-4 rounded-2xl rounded-tl-sm shadow-sm flex items-center gap-2">
                                 <span class="material-symbols-outlined animate-spin text-sm">sync</span> Thinking...
                             </div>
                         </div>
@@ -111,7 +84,7 @@
                             
                             messagesContainer.insertAdjacentHTML('beforeend', `
                                 <div class="flex justify-start mb-4">
-                                    <div class="bg-gray-100 dark:bg-base-800 text-black dark:text-white text-sm py-2 px-4 rounded-2xl rounded-tl-sm max-w-[90%] shadow-sm prose prose-sm dark:prose-invert prose-p:text-black dark:prose-p:text-white prose-strong:text-primary-600 dark:prose-strong:text-primary-400 prose-li:text-black dark:prose-li:text-white">
+                                    <div class="bg-gray-100 dark:bg-gray-800 text-black dark:text-white text-sm py-2 px-4 rounded-2xl rounded-tl-sm max-w-[90%] shadow-sm prose prose-sm dark:prose-invert prose-p:text-black dark:prose-p:text-white prose-strong:text-primary-600 dark:prose-strong:text-primary-400 prose-li:text-black dark:prose-li:text-white">
                                         ${htmlContent}
                                     </div>
                                 </div>
@@ -157,59 +130,49 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-    <div class="custom-panel-container flex items-center gap-1.5 mr-4">
-        <button 
-            type="button"
-            onclick="window.toggleMyPanel()"
-            class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer bg-primary-600 text-white border border-primary-600 hover:bg-primary-700 transition-colors">
-            <span class="material-symbols-outlined shrink-0" style="font-size:0.95rem;line-height:1">smart_toy</span>
-            <span class="whitespace-nowrap">{% trans "AI Assistant" %}</span>
-        </button>
-        
-        <div 
-            onclick="window.toggleMyPanel(true)"
-            class="custom-panel-overlay fixed inset-0 bg-gray-900/20 dark:bg-black/50 z-40 transition-opacity"
-            style="display: none;">
+    <div class="ui-drawer ui-drawer-end mr-4" style="width: auto;">
+        <input id="chatbot-drawer" type="checkbox" class="ui-drawer-toggle" />
+        <div class="ui-drawer-content flex items-center">
+            <label for="chatbot-drawer" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium cursor-pointer bg-primary-600 text-white border border-primary-600 hover:bg-primary-700 transition-colors">
+                <span class="material-symbols-outlined shrink-0" style="font-size:0.95rem;line-height:1">smart_toy</span>
+                <span class="whitespace-nowrap">{% trans "AI Assistant" %}</span>
+            </label>
         </div>
-        
-        <div 
-            class="custom-panel-drawer fixed top-0 right-0 bottom-0 w-96 bg-white dark:bg-base-900 shadow-2xl z-50 transition-transform duration-300 ease-in-out flex flex-col border-l border-base-200 dark:border-base-800 text-left overflow-hidden h-full max-h-screen pb-14"
-            style="transform: translateX(100%);">
-            
-            <div class="px-5 py-4 border-b border-base-200 dark:border-base-800 flex justify-between items-center bg-gray-50 dark:bg-base-800/50">
-                <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary-600">smart_toy</span>
-                    {% trans "Gemini AI Assistant" %}
-                </h2>
-                <button 
-                    type="button"
-                    onclick="window.toggleMyPanel(true)"
-                    class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-base-700 transition-colors flex items-center justify-center">
-                    <span class="material-symbols-outlined" style="font-size: 1.25rem;">close</span>
-                </button>
-            </div>
-            
-            <div class="chat-messages flex-1 overflow-y-auto min-h-0 p-4 space-y-4 bg-gray-50 dark:bg-base-900">
-                <div class="flex justify-start mb-4">
-                    <div class="bg-gray-100 dark:bg-base-800 text-black dark:text-white text-sm py-2 px-4 rounded-2xl rounded-tl-sm max-w-[90%] shadow-sm">
-                        {% trans "Hello! I am your AI assistant. How can I help you today?" %}
+        <div class="ui-drawer-side" style="z-index: 1000;">
+            <label for="chatbot-drawer" aria-label="close sidebar" class="ui-drawer-overlay"></label>
+            <div class="w-96 bg-white dark:bg-gray-900 shadow-2xl flex flex-col text-left overflow-hidden h-full max-h-screen border-l border-gray-200 dark:border-gray-800">
+                <div class="px-5 py-4 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center bg-gray-50 dark:bg-gray-800">
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <span class="material-symbols-outlined text-primary-600">smart_toy</span>
+                        {% trans "Panel" %}
+                    </h2>
+                    <label for="chatbot-drawer" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex items-center justify-center cursor-pointer">
+                        <span class="material-symbols-outlined" style="font-size: 1.25rem;">close</span>
+                    </label>
+                </div>
+                
+                <div class="chat-messages flex-1 overflow-y-auto min-h-0 p-4 space-y-4 bg-gray-50 dark:bg-gray-900">
+                    <div class="flex justify-start mb-4">
+                        <div class="bg-gray-100 dark:bg-gray-800 text-black dark:text-white text-sm py-2 px-4 rounded-2xl rounded-tl-sm max-w-[90%] shadow-sm">
+                            {% trans "Hello! I am your AI assistant. How can I help you today?" %}
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="p-4 border-t border-base-200 dark:border-base-800 bg-white dark:bg-base-900">
-                <form class="chat-form flex gap-2 w-full items-end">
-                    <textarea 
-                        placeholder="{% trans 'Type your question...' %}" 
-                        class="chat-input ui-input ui-input-bordered w-full bg-white dark:bg-base-800 dark:text-white text-sm py-2 px-3 resize-none"
-                        rows="2"
-                        style="min-height: 44px; max-height: 120px; overflow-y: auto; line-height: 1.5;"
-                        required 
-                    ></textarea>
-                    <button type="submit" class="chat-submit ui-btn ui-btn-primary ui-btn-md flex-shrink-0 h-[44px]">
-                        <span class="material-symbols-outlined" style="font-size: 1.1rem;">send</span>
-                    </button>
-                </form>
+                <div class="p-4 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+                    <form class="chat-form flex gap-2 w-full items-end">
+                        <textarea 
+                            placeholder="{% trans 'Type your question...' %}" 
+                            class="chat-input ui-input ui-input-bordered w-full bg-white dark:bg-gray-800 dark:text-white text-sm py-2 px-3 resize-none"
+                            rows="2"
+                            style="min-height: 44px; max-height: 120px; overflow-y: auto; line-height: 1.5;"
+                            required 
+                        ></textarea>
+                        <button type="submit" class="chat-submit ui-btn ui-btn-primary ui-btn-md flex-shrink-0 h-[44px]">
+                            <span class="material-symbols-outlined" style="font-size: 1.1rem;">send</span>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

@@ -20,7 +20,8 @@ if settings.BROWSER_RELOAD:
     ]
     
 urlpatterns += [
+    path("admin/", base_admin_site.urls),
     path("", HomeView.as_view(), name="home"),
-    # path("i18n/", include("django.conf.urls.i18n")),
+    path("i18n/", include("django.conf.urls.i18n")),
     path("ckeditor5/", include('django_ckeditor_5.urls')),
 ]
